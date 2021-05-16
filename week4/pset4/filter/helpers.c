@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 #include "helpers.h"
@@ -12,6 +13,8 @@
 void grayscale(int height, int width, RGBTRIPLE image[height][width])
 {
     int avg;
+
+    // Loop across pixels
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
@@ -49,7 +52,7 @@ void reflect(int height, int width, RGBTRIPLE image[height][width])
     return;
 }
 
-// Blur image
+// Box blur algorithm
 void blur(int height, int width, RGBTRIPLE image[height][width])
 {
     int cnt, totalR, totalG, totalB;
@@ -61,8 +64,10 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
             // Reset values
             cnt = totalR = totalG = totalB = 0;
 
+            // Loop across 3x3 grid around the pixel
             for (int m = i-1; m <= i+1; m++)
             {
+                // Stay within the image borders
                 if (m < 0 || m >= height)
                     continue;
 
@@ -87,13 +92,13 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
 
 
 // Matrices for edge detection
-int gx[3][3] = {
+int Gx[3][3] = {
     {-1, 0, 1},
     {-2, 0, 2},
     {-1, 0, 1}
 };
 
-int gy[3][3] = {
+int Gy[3][3] = {
     {-1, -2, -1},
     {0, 0, 0},
     {1, 2, 1}
@@ -102,16 +107,19 @@ int gy[3][3] = {
 
 // Detect edges
 void edges(int height, int width, RGBTRIPLE image[height][width])
-{ 
+{  
     // Keep track of the total Sobel number in each cell
     int rGx, rGy, gGx, gGy, bGx, bGy;
+    
     // Store the active numbers in Sobel matrices
-    int xVal, yVal;
+    int gxVal, gyVal;
+
     // Keep track of maximum values
     int bMax, gMax, rMax = 0;
     
     // Matrix for storing temporary values following Sobel calculation
-    int tmpMtx[3][height][width];
+    int (*tmpMtx)[height][width];
+    tmpMtx = malloc(3 * sizeof *tmpMtx); 
 
     for (int i = 0; i < height; i++)
     {    
@@ -133,17 +141,18 @@ void edges(int height, int width, RGBTRIPLE image[height][width])
                     if(n < 0 || n >= width)
                         continue;
 
-                    xVal = gx[1+m-i][1+n-j];
-                    yVal = gy[1+m-i][1+n-j];
+                    gxVal = Gx[1+m-i][1+n-j];
+                    gyVal = Gy[1+m-i][1+n-j];
 
-                    rGx += image[m][n].rgbtRed * xVal;
-                    rGy += image[m][n].rgbtRed * yVal;
+                    // Multiply RGB channels by the corresponding Sobel element   
+                    rGx += image[m][n].rgbtRed * gxVal;
+                    rGy += image[m][n].rgbtRed * gyVal;
 
-                    gGx += image[m][n].rgbtGreen * xVal;
-                    gGy += image[m][n].rgbtGreen * yVal;
+                    gGx += image[m][n].rgbtGreen * gxVal;
+                    gGy += image[m][n].rgbtGreen * gyVal;
 
-                    bGx += image[m][n].rgbtBlue * xVal;
-                    bGy += image[m][n].rgbtBlue * yVal;
+                    bGx += image[m][n].rgbtBlue * gxVal;
+                    bGy += image[m][n].rgbtBlue * gyVal;
                 }
             }
             
@@ -164,10 +173,11 @@ void edges(int height, int width, RGBTRIPLE image[height][width])
     {    
         for (int j = 0; j < width; j++)
         {
-            image[i][j].rgbtRed = tmpMtx[0][i][j] * 255 / rMax;
-            image[i][j].rgbtGreen = tmpMtx[1][i][j] * 255 / gMax;
-            image[i][j].rgbtBlue = tmpMtx[2][i][j] * 255 / bMax;
+            image[i][j].rgbtRed = (tmpMtx[0][i][j] * 255) / rMax;
+            image[i][j].rgbtGreen = (tmpMtx[1][i][j] * 255) / gMax;
+            image[i][j].rgbtBlue = (tmpMtx[2][i][j] * 255) / bMax;
         }
     }
+    free(tmpMtx);
     return;
 }
