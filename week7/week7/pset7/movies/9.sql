@@ -1,0 +1,1 @@
+SELECT name FROM movies, stars, people WHERE movies.id = stars.movie_id AND stars.person_id = people.id AND year = 2004 GROUP BY stars.person_id ORDER BY birth;
