@@ -65,16 +65,20 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
             cnt = totalR = totalG = totalB = 0;
 
             // Loop across 3x3 grid around the pixel
-            for (int m = i-1; m <= i+1; m++)
+            for (int m = i - 1; m <= i + 1; m++)
             {
                 // Stay within the image borders
                 if (m < 0 || m >= height)
-                    continue;
-
-                for (int n = j-1; n <= j+1; n++)
                 {
-                    if(n < 0 || n >= width)
+                    continue;
+                }
+
+                for (int n = j - 1; n <= j + 1; n++)
+                {
+                    if (n < 0 || n >= width)
+                    {
                         continue;
+                    }
                         
                     totalR += image[m][n].rgbtRed;
                     totalG += image[m][n].rgbtGreen;
@@ -92,13 +96,15 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
 
 
 // Matrices for edge detection
-int Gx[3][3] = {
+int Gx[3][3] = 
+{
     {-1, 0, 1},
     {-2, 0, 2},
     {-1, 0, 1}
 };
 
-int Gy[3][3] = {
+int Gy[3][3] = 
+{
     {-1, -2, -1},
     {0, 0, 0},
     {1, 2, 1}
@@ -119,7 +125,7 @@ void edges(int height, int width, RGBTRIPLE image[height][width])
     
     // Matrix for storing temporary values following Sobel calculation
     int (*tmpMtx)[height][width];
-    tmpMtx = malloc(3 * sizeof *tmpMtx); 
+    tmpMtx = malloc(3 * sizeof * tmpMtx); 
 
     for (int i = 0; i < height; i++)
     {    
@@ -129,20 +135,24 @@ void edges(int height, int width, RGBTRIPLE image[height][width])
             rGx = rGy = gGx = gGy = bGx = bGy = 0;
 
             // Loop across outer cells
-            for (int m = i-1; m <= i+1; m++)
+            for (int m = i - 1; m <= i + 1; m++)
             {    
                 // Stay within image height
                 if (m < 0 || m >= height)
+                {
                     continue;
+                }
 
-                for (int n = j-1; n <= j+1; n++)
+                for (int n = j - 1; n <= j + 1; n++)
                 {
                     // Stay within image width
-                    if(n < 0 || n >= width)
+                    if (n < 0 || n >= width)
+                    {
                         continue;
+                    }
 
-                    gxVal = Gx[1+m-i][1+n-j];
-                    gyVal = Gy[1+m-i][1+n-j];
+                    gxVal = Gx[1 + m - i][1 + n - j];
+                    gyVal = Gy[1 + m - i][1 + n - j];
 
                     // Multiply RGB channels by the corresponding Sobel element   
                     rGx += image[m][n].rgbtRed * gxVal;
