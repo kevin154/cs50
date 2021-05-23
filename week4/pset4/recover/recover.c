@@ -32,17 +32,18 @@ int main(int argc, char *argv[])
     int idx = 0;
 
     // Read data in chunks
-    while(fread(&buffer, BLOCK_SIZE, 1, input))
+    while (fread(&buffer, BLOCK_SIZE, 1, input))
     {
         // Check if buffer chunk is likely a jpeg file
         if (buffer[0] == 0xff && buffer[1] == 0xd8 && buffer[2] == 0xff)
         {
             // If new jpeg found close any open files
             if (output != NULL)
+            {
                 fclose(output);
-            
+            }
             // Generate new file name
-            snprintf(outputFileName, sizeof(char) * fileNameSize, "file%i.jpeg", ++idx);
+            snprintf(outputFileName, sizeof(char) * fileNameSize, "%03d.jpg", idx++);
 
             // Open a new file for writing
             output = fopen(outputFileName, "w");
@@ -56,7 +57,9 @@ int main(int argc, char *argv[])
         }
         // If not a new jpeg then continue writing
         else if (output != NULL)
+        {
             fwrite(&buffer, BLOCK_SIZE, 1, output);
+        }
     }
 
     // Close input and output files
