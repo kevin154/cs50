@@ -118,8 +118,10 @@ void record_preferences(int ranks[])
 {
     for (int i = 0; i < candidate_count - 1; i++)
     {
-        for (int j = i+1; j < candidate_count; j++)    
+        for (int j = i + 1; j < candidate_count; j++)
+        {
             preferences[ranks[i]][ranks[j]] += 1;
+        }
     }
     return;
 }
@@ -160,12 +162,14 @@ int pair_strength(pair p)
 // A function to implement bubble sort in descending order
 void bubbleSort(pair arr[], int n)
 {
-   int i, j;
-   for (i = 0; i < n-1; i++)      
-       // Last i elements are already in place   
-       for (j = 0; j < n-i-1; j++) 
-           if (pair_strength(arr[j]) < pair_strength(arr[j+1]))
-              swap(&arr[j], &arr[j+1]);
+    int i, j;
+    for (i = 0; i < n - 1; i++)      
+        // Last i elements are already in place   
+        for (j = 0; j < n - i - 1; j++) 
+            if (pair_strength(arr[j]) < pair_strength(arr[j + 1]))
+            {
+                swap(&arr[j], &arr[j + 1]);
+            }
 }
 
 // Sort pairs in decreasing order by strength of victory
@@ -176,11 +180,11 @@ void sort_pairs(void)
 }
 
 // Check for cycles in the graph
-bool check_cycle(void){
-
+bool check_cycle(void)
+{
     for (int i = 0; i < candidate_count; i++)
     {
-        // Cnt stores the number of false elements in each column
+        // Variable to store the number of false elements in each column
         int cnt = 0;
         for (int j = 0; j < candidate_count; j++)
         {
@@ -189,7 +193,9 @@ bool check_cycle(void){
         }
         // If one column has all false then graph is not locked
         if (cnt == candidate_count)
+        {
             return false;
+        }
     }
     // If graph does not have an all false column then it is locked 
     return true;
@@ -203,17 +209,19 @@ void lock_pairs(void)
         locked[pairs[i].winner][pairs[i].loser] = true;
         // If the above crates a cycle then reverse the change
         if (check_cycle())
+        {
             locked[pairs[i].winner][pairs[i].loser] = false;
+        }
     }
     return;
 }
 
-// Print the winner of the election
+// Print the winner(s) of the election
 void print_winner(void)
 {
     for (int i = 0; i < candidate_count; i++)
     {
-        // Need one column with all false, check the count
+        // Variable to keep track of false elements within each column 
         int cnt = 0;
         for (int j = 0; j < candidate_count; j++)
         {
@@ -222,7 +230,9 @@ void print_winner(void)
         }
         // If column has all false then that candidate is the winner
         if (cnt == candidate_count)
+        {
             printf("%s\n", candidates[i]);
+        }
     }
     return;
 }    
