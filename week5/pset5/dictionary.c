@@ -31,7 +31,7 @@ node *table[N];
 bool check(const char *word)
 {
     // Convert to lowercase
-    size_t len = strlen(word);
+    size_t len = 1 + strlen(word);
     char *lower = malloc(len * sizeof(char));
     strcpy(lower, word);
 
@@ -66,11 +66,13 @@ bool check(const char *word)
 unsigned int hash(const char *word)
 {
     // djb2 hash function
-	// http://www.cse.yorku.ca/~oz/hash.html
-	unsigned int hash = 5381;
-	int c;
-	while ((c = *word++))
-	    hash = ((hash << 5) + hash) + c;
+    // http://www.cse.yorku.ca/~oz/hash.html
+    unsigned int hash = 5381;
+    int c;
+    while ((c = *word++))
+    {
+        hash = ((hash << 5) + hash) + c;
+    }
     return hash % N;
 }
 
@@ -85,22 +87,34 @@ bool load(const char *dictionary)
         return false;
     }
 
-    char buffer[LENGTH + 1];
+    char buffer[LENGTH + 2];
 
-    while(fgets(buffer, LENGTH + 1, input)) 
+    while (fgets(buffer, LENGTH + 2, input)) 
     {
-        node* new_node = malloc(sizeof(node));
-        buffer[strcspn(buffer, "\n")] = 0; 
+        node *new_node = malloc(sizeof(node));
+        
+        // Ensure max length is adhered to by checking newline, else remove newline
+        if (strchr(buffer, '\n') == NULL)
+        {
+            continue;
+        }
+        else 
+        {
+            buffer[strcspn(buffer, "\n")] = '\0';
+        }
+        
+        // Copy buffer into current node
         strncpy(new_node->word, buffer, LENGTH + 1);
-        new_node->next = NULL;
-
+        
         unsigned int index = hash(buffer);
 
         // Check if hashtable key is NULL
         if (table[index] == NULL)
         {    
+            new_node->next = NULL;
             table[index] = new_node;    
         }
+        // Chain new word to existing table index
         else 
         {
             new_node->next = table[index];
@@ -118,13 +132,13 @@ unsigned int size(void)
     return dictCount;
 }
 
-// Unloads dictionary from memory, returning true if successful, else false
+// Unloads dictionary from memory, returning true if successful
 bool unload(void)
 {
     node *cursor, *tmp;
 
-    for (int i = 0; i < N; i++){
-
+    for (int i = 0; i < N; i++)
+    {
         cursor = table[i];
         while (cursor != NULL)
         {
@@ -132,8 +146,7 @@ bool unload(void)
             free(cursor);
             cursor = tmp;
         }
-        dictCount = 0;
-        return true;
     }
-    return false;
+    dictCount = 0;
+    return true;
 }
