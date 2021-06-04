@@ -180,25 +180,23 @@ void sort_pairs(void)
 }
 
 // Check for cycles in the graph
-bool check_cycle(void)
+bool check_cycle(winner, loser)
 {
+    if (locked[loser][winner])
+    {
+        return true;
+    }
+
     for (int i = 0; i < candidate_count; i++)
     {
-        // Variable to store the number of false elements in each column
-        int cnt = 0;
-        for (int j = 0; j < candidate_count; j++)
+        // Check what candidates have beaten the winner
+        if (locked[i][winner])
         {
-            // Add a count of the falses
-            cnt += (locked[j][i] == false);
-        }
-        // If one column has all false then graph is not locked
-        if (cnt == candidate_count)
-        {
-            return false;
+            // For candidates that have beaten winner, ensure loser hasn't beaten them
+            return check_cycle(i, loser);
         }
     }
-    // If graph does not have an all false column then it is locked 
-    return true;
+    return false;
 }
 
 // Lock pairs into the candidate graph in order, without creating cycles
@@ -206,11 +204,10 @@ void lock_pairs(void)
 {
     for (int i = 0; i < pair_count; i++)
     {
-        locked[pairs[i].winner][pairs[i].loser] = true;
-        // If the above crates a cycle then reverse the change
-        if (check_cycle())
+        // Lock graph if cycle hasnt been created
+        if (!check_cycle(pairs[i].winner, pairs[i].loser))
         {
-            locked[pairs[i].winner][pairs[i].loser] = false;
+            locked[pairs[i].winner][pairs[i].loser] = true;
         }
     }
     return;
@@ -236,3 +233,4 @@ void print_winner(void)
     }
     return;
 }    
+
