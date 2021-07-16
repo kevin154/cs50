@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+        <link href="styles.css" rel="stylesheet">
+        <title>Trivia!</title>
+
+        <script>
+
+            function handleResponse(clicked_id, pID, result)
+            {
+                if(result == 1)
+                {
+                    document.getElementById(clicked_id).style.backgroundColor = 'green';
+                    document.querySelector('#' + pID).innerHTML = 'Correct!';
+                } 
+                else if (result == -1)
+                {
+                    document.getElementById(clicked_id).style.backgroundColor = 'red';
+                    document.querySelector('#' + pID).innerHTML = 'Incorrect';
+                } 
+                else
+                {
+                    document.querySelector('#' + pID).innerHTML = '';
+                }
+            }
+
+            function refresh()
+            {
+                var buttons = document.querySelectorAll(".button");
+                for (var i = 0; i < buttons.length; i++)
+                {
+                    buttons[i].style.backgroundColor = '';
+                }
+            }
+
+            function do_true(clicked_id)
+            {
+                refresh();
+                handleResponse(clicked_id, "Q1msg", 1);               
+            }
+                
+            function do_false(clicked_id)
+            {
+                refresh();
+                handleResponse(clicked_id, "Q1msg", -1);
+            }
+
+            function checkAnswer()
+            {   
+                let answer = document.querySelector('#answer');
+                if (answer.value.toLowerCase() == 'switzerland') 
+                {
+                    handleResponse("answer", "Q2msg", 1);
+                }
+                else if (answer.value == '')
+                {
+                    handleResponse("answer", "Q2msg", 0);
+                }
+                else 
+                {
+                    handleResponse("answer", "Q2msg", -1);
+                }   
+            }
+
+        </script>
+    </head>
+
+    <body>
+
+        <div class="jumbotron">
+            <h1>Trivia!</h1>
+        </div>
+
+        <div class="container">
+
+            <div class="section">
+                <h2>Part 1: Multiple Choice </h2>
+                <hr>
+               
+                <h3> What is the ratio of people to sheep in New Zealand? </h3>
+
+                <button class="button" id="6to1" onClick="do_false(this.id)">6 people per 1 sheep</button>
+                <button class="button" id="3to1" onClick="do_false(this.id)">3 people per 1 sheep</button>
+                <button class="button" id="1to1" onClick="do_false(this.id)">1 person per 1 sheep</button>
+                <button class="button" id="1to3" onClick="do_false(this.id)">1 person per 3 sheep</button>
+                <button class="button" id="1to6" onClick="do_true(this.id)">1 person per 6 sheep</button>
+
+                <p id="Q1msg"></p>  
+
+            </div>
+
+            <div class="section">
+                
+                <h2>Part 2: Free Response</h2>
+                <hr>
+
+                <h3> In what country is it illegal to own just one guinea pig, as a lone guinea pig might get lonely? </h3>
+
+                <form onsubmit="checkAnswer(); return false;">
+                    <input autocomplete="off" autofocus id="answer" autofocus placeholder="" type="text">
+                    <input type='submit' value="Check Answer"> 
+                </form>
+
+                <p id="Q2msg"></p>  
+
+            </div>
+
+        </div>
+    </body>
+</html>
